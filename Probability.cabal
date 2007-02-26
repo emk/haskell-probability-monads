@@ -1,0 +1,11 @@
+Name:                Probability
+Version:             0.0
+Synopsis:            Probabilistic calculations
+License:             BSD3
+License-file:        LICENSE
+Author:              Eric Kidd
+Stability:           experimental
+Build-Depends:       base, mtl
+Exposed-modules:     Control.Monad.Maybe
+Extensions:          UndecidableInstances
+ghc-options:         -Wall -O

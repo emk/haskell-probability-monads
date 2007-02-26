@@ -1,0 +1,21 @@
+This is a probability library inspired by Martin Erwig's and Steve
+Kollmansberger's "Probabilistic Functional Programming"[1], but with many
+additions and an underlying structure factored into monad transformers.
+
+To install, type:
+
+  runhaskell Setup.hs configure
+  runhaskell Setup.hs build
+  runhaskell Setup.hs install
+
+To build documentation, make sure Haddock is installed, and type:
+
+  runhaskell Setup.hs haddock
+
+This library is highly experimental, and the APIs may change without
+notice.
+
+For further information, please see my blog[2].
+
+[1] http://web.engr.oregonstate.edu/~erwig/pfp/
+[2] http://www.randomhacks.net/articles/tag/Probability
