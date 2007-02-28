@@ -15,6 +15,10 @@ To build documentation, make sure Haddock is installed, and type:
 This library is highly experimental, and the APIs may change without
 notice.
 
+The actual implementations of the probability monads currently appear in
+examples/Probability.hs.  These will eventually be moved into the main
+library.
+
 For further information, please see my blog[2].
 
 [1] http://web.engr.oregonstate.edu/~erwig/pfp/

@@ -1,7 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses, UndecidableInstances #-}
 
 {- |
-Module       : Control.Monad.Maybe
 Copyright    : 2007 Eric Kidd
 License      : BSD3
 Stability    : experimental

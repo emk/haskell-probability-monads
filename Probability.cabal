@@ -1,11 +1,13 @@
 Name:                Probability
 Version:             0.0
-Synopsis:            Probabilistic calculations
+Synopsis:            Tools for calculating with probabilities.
+Description:         Probabilities, probability distribution monads, and related
+                     tools.
 License:             BSD3
 License-file:        LICENSE
 Author:              Eric Kidd
 Stability:           experimental
 Build-Depends:       base, mtl
-Exposed-modules:     Control.Monad.Maybe
-Extensions:          UndecidableInstances
+Exposed-modules:     Control.Monad.Maybe, Control.Monad.Dist,
+                     Control.Monad.Perhaps, Data.Prob
 ghc-options:         -Wall -O
