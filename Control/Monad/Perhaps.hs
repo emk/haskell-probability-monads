@@ -19,7 +19,10 @@ import Control.Monad
 import Control.Monad.Trans
 
 data Perhaps a = Perhaps { perhapsValue :: a, perhapsProb :: Prob }
-  deriving (Show)
+
+instance Show a => Show (Perhaps a) where
+  show (Perhaps _ 0) = "never"
+  show (Perhaps x p) = "Perhaps " ++ show x ++ " " ++ show p
 
 never :: Perhaps a
 never = Perhaps undefined 0
@@ -27,12 +30,12 @@ never = Perhaps undefined 0
 always :: a -> Perhaps a
 always x = Perhaps x         1
 
-possible :: Perhaps a -> Bool
-possible p = perhapsProb p == 0
-
 impossible :: Perhaps a -> Bool
-impossible = not . possible
- 
+impossible p = perhapsProb p == 0
+
+possible :: Perhaps a -> Bool
+possible = not . impossible
+
 perhaps :: b -> (a -> b) -> Perhaps a -> b
 perhaps defaultValue f ph | impossible ph = defaultValue
                           | otherwise     = f (perhapsValue ph)
