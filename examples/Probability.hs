@@ -267,6 +267,61 @@ hasTokens ws prior =
 
 
 -- ========================================================================
+-- Robot localization
+--
+-- Example based on "Bayesian Filters for Location Estimation", Fox et al.,
+-- 2005.  Available online at:
+--
+-- http://seattle.intel-research.net/people/jhightower/pubs/fox2003bayesian/fox2003bayesian.pdf
+
+-- The hallway extends from 0 to 299, and
+-- it contains three doors.
+doorAtPosition :: Int -> Bool
+doorAtPosition pos
+    -- Doors 1, 2 and 3.
+    |  26 <= pos && pos <  58 = True
+    |  82 <= pos && pos < 114 = True
+    | 192 <= pos && pos < 224 = True
+    | otherwise        = False
+
+localizeRobot :: WPS Int
+localizeRobot = do
+  -- Pick a random starting location
+  -- to use as a hypothesis.
+  pos1 <- uniform [0..299]
+  -- We know we're at a door.  Hypotheses
+  -- which agree with this fact get a
+  -- weight of 1, others get 0.
+  if doorAtPosition pos1
+    then weight 1
+    else weight 0
+
+  -- Drive forward a bit.
+  let pos2 = pos1 + 28
+  -- We know we're not at a door.
+  if not (doorAtPosition pos2)
+    then weight 1
+    else weight 0
+
+  -- Drive forward some more.
+  let pos3 = pos2 + 28
+  if doorAtPosition pos3
+    then weight 1
+    else weight 0
+  -- Our final hypothesis.
+  return pos3
+
+-- > runRand (runWPS localizeRobot 10)
+-- [Perhaps 106 100.0%,
+--  never,never,never,never,never,
+--  Perhaps 93 100.0%,
+--  never,never,never]
+
+-- > runWPS' localizeRobot 10
+-- [97,109,93]
+
+
+-- ========================================================================
 -- Finite distributions
 --
 -- Heavily inspired by Martin Erwig's and Steve Kollmansberger's
@@ -366,3 +421,53 @@ sampleIO r n = runRand (sample r n)
 
 histogram :: Ord a => [a] -> [Int]
 histogram = map length . group . sort
+
+
+-- ========================================================================
+-- Particle System
+
+newtype PS a = PS { runPS :: Int -> Rand [a] }
+
+liftRand :: Rand a -> PS a
+liftRand r = PS (sample r)
+
+instance Functor PS where
+  fmap f ps = PS mapped
+    where mapped n =
+            liftM (map f) (runPS ps n)
+
+instance Monad PS where
+  return = liftRand . return
+  ps >>= f = joinPS (fmap f ps)
+
+joinPS :: PS (PS a) -> PS a
+joinPS psps = PS (joinPS' psps)
+
+joinPS' :: PS (PS a) -> Int -> Rand [a]
+joinPS' psps n = do
+    pss <- (runPS psps n)
+    xs <- sequence (map sample1 pss)
+    return (concat xs) -- TODO: Can we base on Rand's join?
+  where sample1 ps = runPS ps 1
+
+instance Dist PS where
+  weighted = liftRand . weighted
+
+type WPS = PerhapsT PS
+
+instance Dist (PerhapsT PS) where
+  weighted = PerhapsT . weighted . map liftWeighted
+    where liftWeighted (x,w) = (Perhaps x 1,w)
+
+weight :: Prob -> WPS ()
+weight p = PerhapsT (return (Perhaps () p))
+
+runWPS wps n = runPS (runPerhapsT wps) n
+
+runWPS' wps n = (runRand . liftM catPossible) (runWPS wps n)
+
+catPossible (ph:phs) | impossible ph =
+  catPossible phs
+catPossible (Perhaps x p:phs) =
+  x:(catPossible phs)
+catPossible [] = []
