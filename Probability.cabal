@@ -8,6 +8,5 @@ License-file:        LICENSE
 Author:              Eric Kidd
 Stability:           experimental
 Build-Depends:       base, mtl
-Exposed-modules:     Control.Monad.Maybe, Control.Monad.Dist,
-                     Control.Monad.Perhaps, Data.Prob
+Exposed-modules:     Control.Monad.Dist, Control.Monad.Perhaps, Data.Prob
 ghc-options:         -Wall -O
