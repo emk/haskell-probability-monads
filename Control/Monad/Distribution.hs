@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses, UndecidableInstances #-}
+
 {- |
 Copyright    : 2007 Eric Kidd
 License      : BSD3
@@ -12,12 +14,24 @@ For background, see Michele Giry, /A Categorical Approach to Probability
 Theory/.
 
 -}
+
 module Control.Monad.Distribution (
+    -- * Common interface
+    -- $Interface
     Dist, weighted, uniform,
+    -- * Random sampling functions
+    -- $Rand
     module Control.Monad.Random,
+    -- * Discrete, finite distributions
+    -- $DDist
   ) where
 
+import Control.Monad.MonoidValue
 import Control.Monad.Random
+import Data.Probability
+
+{- $Interface
+-}
 
 -- | Represents a probability distribution.
 class (Functor d, Monad d) => Dist d where
@@ -31,7 +45,18 @@ class (Functor d, Monad d) => Dist d where
 uniform :: Dist d => [a] -> d a
 uniform = weighted . map (\x -> (x, 1))
 
+{- $Rand
+-}
+
 -- Make all the standard instances of MonadRandom into probability
 -- distributions.
 instance (Monad m, RandomGen g) => Dist (RandT g m) where 
   weighted = fromList
+
+{- $DDist
+-}
+
+instance (Probability p) => Dist (MVT p []) where
+  weighted wvs = MVT (map toMV wvs)
+    where toMV (v, w) = MV (prob (w / total)) v 
+          total = sum (map snd wvs)

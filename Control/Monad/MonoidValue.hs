@@ -32,7 +32,7 @@ the monoid action.
 
 module Control.Monad.MonoidValue (
     module Data.Monoid,
-    MV, mvMonoid, mvValue, MVT, runMVT
+    MV(MV), mvMonoid, mvValue, MVT(MVT), runMVT
   ) where
 
 import Control.Monad.Trans
@@ -43,6 +43,8 @@ import Data.Monoid
 data (Monoid w) => MV w a =
   MV { mvMonoid :: w, mvValue :: a }
 
+-- We build our functor and monad instances from 'mapMV' and 'joinMV' for
+-- simplicity.
 mapMV :: (Monoid w) => (a -> b) -> MV w a -> MV w b
 mapMV f (MV w v) = MV w (f v)
 
@@ -61,15 +63,21 @@ instance (Monoid w) => Monad (MV w) where
 newtype (Monoid w, Monad m) => MVT w m a =
   MVT { runMVT :: m (MV w a) }
 
-instance  (Monoid w) => MonadTrans (MVT w) where
-  lift mv = MVT (do  v <- mv
-                     return (MV mempty v))
+instance (Monoid w) => MonadTrans (MVT w) where
+  lift mv = MVT (do v <- mv
+                    return (MV mempty v))
 
-instance  (Monoid w, Monad m) => Monad (MVT w m) where
-  return    =  lift . return
-  ma >>= f  =  MVT bound
+instance (Monoid w, Monad m) => Functor (MVT w m) where
+  fmap f ma = MVT mapped
+    where mapped = do
+            (MV w v) <- runMVT ma
+            return (MV w (f v))
+
+instance (Monoid w, Monad m) => Monad (MVT w m) where
+  return   = lift . return
+  ma >>= f = MVT bound
     where  bound = do
-             (MV w1 v1)  <-  runMVT ma
-             (MV w2 v2)  <-  runMVT (f v1)
+             (MV w1 v1) <- runMVT ma
+             (MV w2 v2) <- runMVT (f v1)
              return (MV (w1 `mappend` w2) v2)
 
