@@ -22,7 +22,7 @@ module Control.Monad.Distribution (
     -- * Random sampling functions
     -- $Rand
     module Control.Monad.Random,
-    BRand,
+    BRand, sample, sampleIO,
     -- * Discrete, finite distributions
     -- $DDist
     bayes
@@ -32,6 +32,7 @@ import Control.Monad
 import Control.Monad.Maybe
 import Control.Monad.MonoidValue
 import Control.Monad.Random
+import Control.Monad.Trans
 import Data.List
 import Data.Maybe
 import Data.Probability
@@ -51,6 +52,18 @@ class (Functor d, Monad d) => Dist d where
 uniform :: Dist d => [a] -> d a
 uniform = weighted . map (\x -> (x, 1))
 
+-- | A distribution which supports 'Dist' and 'Control.Monad.MonadPlus'
+-- supports Bayes' rule.  Use 'Control.Monad.guard' to calculate a
+-- conditional probability.
+class (Dist d, MonadPlus d) => BayesDist d
+  -- TODO: Do we want to add an associated type here, pointing to the
+  -- underlying distribution type?
+
+-- Applying MaybeT to a distribution gives you another distribution, but
+-- with support for Bayes' rule.
+instance (Dist d) => Dist (MaybeT d) where
+  weighted wvs = lift (weighted wvs)
+
 {- $Rand
 -}
 
@@ -62,7 +75,9 @@ instance (Monad m, RandomGen g) => Dist (RandT g m) where
 -- | 
 type BRand g = MaybeT (Rand g)
 
-instance (RandomGen g) => MonadPlus (BRand g) where
+instance (RandomGen g, Monad m) => BayesDist (MaybeT (RandT g m))
+
+instance (RandomGen g, Monad m) => MonadPlus (MaybeT (RandT g m)) where
   mzero = MaybeT (return Nothing)
   -- TODO: I'm not sure this is particularly sensible or useful.
   d1 `mplus` d2 = MaybeT choose
@@ -72,6 +87,14 @@ instance (RandomGen g) => MonadPlus (BRand g) where
               Nothing -> runMaybeT d2
               Just _  -> return x1
 
+-- | Take @n@ samples from the distribution @r@.
+sample :: (MonadRandom m) => m a -> Int -> m [a]
+sample r n = sequence (replicate n r)
+
+-- | Take @n@ samples from the distribution @r@ using the IO monad.
+sampleIO r n = evalRandIO (sample r n)
+sampleIO :: Rand StdGen a -> Int -> IO [a]
+
 {- $DDist
 -}
 
@@ -80,9 +103,23 @@ instance (Probability p) => Dist (MVT p []) where
     where toMV (v, w) = MV (prob (w / total)) v 
           total = sum (map snd wvs)
 
+instance (Probability p) => BayesDist (MaybeT (MVT p [])) where
+
+instance (Probability p) => MonadPlus (MaybeT (MVT p [])) where
+  mzero = MaybeT (return Nothing)
+  -- TODO: I'm not sure this is particularly sensible or useful.
+  d1 `mplus` d2
+     | isNothing (bayes d1)  = d2
+     | otherwise             = d1
+
 catMaybes' :: (Monoid w) => [MV w (Maybe a)] -> [MV w a]
 catMaybes' = map (liftM fromJust) . filter (isJust . mvValue)
 
+-- | Apply Bayes' rule, discarding impossible outcomes and normalizing the
+-- probabilities that remain.
+--
+-- TODO: It's entirely possible that this method should be moved to a type
+-- class.
 bayes :: (Probability p) =>
          MaybeT (MVT p []) a -> Maybe ((MVT p []) a)
 bayes bfd

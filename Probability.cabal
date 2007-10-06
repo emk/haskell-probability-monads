@@ -15,4 +15,4 @@ Exposed-modules:     Data.Probability,
                      Control.Monad.Distribution,
                      Control.Monad.Distribution.Double,
                      Control.Monad.Distribution.Rational
-ghc-options:         -Wall -O
+ghc-options:         -Wall -fno-warn-orphans -O
