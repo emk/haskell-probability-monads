@@ -1,39 +1,26 @@
-{- |
-Copyright    : 2007 Eric Kidd
-License      : BSD3
-Stability    : experimental
-Portability  : non-portable (newtype deriving)
-
-Support for probability values.
--}
-
 module Data.Probability (
-    Probability,
-    prob, fromProb,
-    pnot, padd, pmul
+    module Data.Probability.Base,
+    Prob()
   ) where
 
 import Data.Monoid
+import Data.Probability.Base
 
--- | The probability of an event occuring.  We provide this as a type
--- class, allowing users of this library to choose among various
--- representations of probability.
-class (Eq p, Monoid p) => Probability p where
-  -- TODO: Should 'prob' and 'fromProb' work with Rational or another type?
-  -- They exist mostly to interface with
-  -- 'Control.Monad.Distribution.weighted'.
+-- | An implementation of 'Data.Probability.Probability' using
+-- double-precision floating-point numbers.
+newtype Prob = Prob Double
+  deriving (Eq)
 
-  -- | Create a probability from a rational number between 0 and 1, inclusive.
-  prob :: Rational -> p
-  -- | Convert a probability to a rational number.
-  fromProb :: p -> Rational
+instance Probability Prob where
+  prob = Prob . fromRational
+  fromProb (Prob p) = toRational p
+  pnot (Prob p) = Prob (1-p)
+  padd (Prob p1) (Prob p2) = Prob (p1 + p2)
+  pmul (Prob p1) (Prob p2) = Prob (p1 * p2)
 
-  -- | Given the probability of an event occuring, calculate the
-  -- probability of the event /not/ occuring.
-  pnot :: p -> p
-  -- | Given the probabilities of two disjoint events, calculate the
-  -- probability of either event occuring.
-  padd :: p -> p -> p
-  -- | Given the probabilities of two indepedent events, calculate the
-  -- probability of both events occuring.
-  pmul :: p -> p -> p
+instance Monoid Prob where
+  mempty = prob 1
+  mappend = pmul
+
+instance Show Prob where
+  show (Prob p) = show p

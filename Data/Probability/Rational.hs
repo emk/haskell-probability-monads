@@ -1,10 +1,10 @@
 module Data.Probability.Rational (
-    module Data.Probability,
+    module Data.Probability.Base,
     Prob()
   ) where
 
 import Data.Monoid
-import Data.Probability
+import Data.Probability.Base
 
 -- | An implementation of 'Data.Probability.Probability' using rational
 -- numbers.

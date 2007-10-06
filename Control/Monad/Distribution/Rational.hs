@@ -1,9 +1,9 @@
 module Control.Monad.Distribution.Rational (
-    module Control.Monad.Distribution,
+    module Control.Monad.Distribution.Base,
     DDist, ddist, BDDist
   ) where
 
-import Control.Monad.Distribution
+import Control.Monad.Distribution.Base
 import Control.Monad.Maybe
 import Control.Monad.MonoidValue
 import Data.Probability.Rational

@@ -8,11 +8,11 @@ License-file:        LICENSE
 Author:              Eric Kidd
 Stability:           experimental
 Build-Depends:       base, mtl, MaybeT, MonadRandom
-Exposed-modules:     Data.Probability,
-                     Data.Probability.Double,
+Exposed-modules:     Data.Probability.Base,
+                     Data.Probability,
                      Data.Probability.Rational,
                      Control.Monad.MonoidValue,
+                     Control.Monad.Distribution.Base,
                      Control.Monad.Distribution,
-                     Control.Monad.Distribution.Double,
                      Control.Monad.Distribution.Rational
 ghc-options:         -Wall -fno-warn-orphans -O
