@@ -43,6 +43,9 @@ import Data.Monoid
 data (Monoid w) => MV w a =
   MV { mvMonoid :: w, mvValue :: a }
 
+instance (Monoid w, Show w, Show a) => Show (MV w a) where
+  show (MV w a) = "MV " ++ show w ++ " " ++ show a
+
 -- We build our functor and monad instances from 'mapMV' and 'joinMV' for
 -- simplicity.
 mapMV :: (Monoid w) => (a -> b) -> MV w a -> MV w b

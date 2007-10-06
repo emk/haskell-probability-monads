@@ -69,23 +69,36 @@ instance (Dist d) => Dist (MaybeT d) where
 
 -- Make all the standard instances of MonadRandom into probability
 -- distributions.
+instance (RandomGen g) => Dist (Rand g) where
+  weighted = fromList
 instance (Monad m, RandomGen g) => Dist (RandT g m) where 
   weighted = fromList
 
 -- | 
 type BRand g = MaybeT (Rand g)
 
+instance (RandomGen g) => BayesDist (MaybeT (Rand g))
 instance (RandomGen g, Monad m) => BayesDist (MaybeT (RandT g m))
 
+instance (RandomGen g) => MonadPlus (MaybeT (Rand g)) where
+  mzero = randMZero
+  mplus = randMPlus
+
 instance (RandomGen g, Monad m) => MonadPlus (MaybeT (RandT g m)) where
-  mzero = MaybeT (return Nothing)
-  -- TODO: I'm not sure this is particularly sensible or useful.
-  d1 `mplus` d2 = MaybeT choose
-    where choose = do
-            x1 <- runMaybeT d1
-            case x1 of
-              Nothing -> runMaybeT d2
-              Just _  -> return x1
+  mzero = randMZero
+  mplus = randMPlus
+
+randMZero :: (MonadRandom m) => (MaybeT m a)
+randMZero = MaybeT (return Nothing)
+
+-- TODO: I'm not sure this is particularly sensible or useful.
+randMPlus :: (MonadRandom m) => (MaybeT m a) -> (MaybeT m a) -> (MaybeT m a)
+randMPlus d1 d2 = MaybeT choose
+  where choose = do
+          x1 <- runMaybeT d1
+          case x1 of
+            Nothing -> runMaybeT d2
+            Just _  -> return x1
 
 -- | Take @n@ samples from the distribution @r@.
 sample :: (MonadRandom m) => m a -> Int -> m [a]
@@ -102,6 +115,16 @@ instance (Probability p) => Dist (MVT p []) where
   weighted wvs = MVT (map toMV wvs)
     where toMV (v, w) = MV (prob (w / total)) v 
           total = sum (map snd wvs)
+
+instance (Show a, Ord a, Show p, Probability p) => Show (MVT p [] a) where
+  show = show . simplify . runMVT
+
+simplify :: (Probability p, Ord a) => [MV p a] -> [MV p a]
+simplify = map (foldr1 merge) . groupEvents . sortEvents
+  where sortEvents = sortBy (liftOp compare)
+        groupEvents = groupBy (liftOp (==))
+        liftOp op  (MV _   v1) (MV _   v2)  = op v1 v2
+        merge      (MV w1  v1) (MV w2  _)   = MV (w1 `padd` w2) v1
 
 instance (Probability p) => BayesDist (MaybeT (MVT p [])) where
 
