@@ -10,7 +10,7 @@ Support for probability values.
 module Data.Probability (
     Probability,
     prob, fromProb,
-    pnot, padd, pmul, pzero, pone
+    pnot, padd, pmul
   ) where
 
 import Data.Monoid
@@ -27,6 +27,7 @@ class (Eq p, Monoid p) => Probability p where
   prob :: Rational -> p
   -- | Convert a probability to a rational number.
   fromProb :: p -> Rational
+
   -- | Given the probability of an event occuring, calculate the
   -- probability of the event /not/ occuring.
   pnot :: p -> p
@@ -36,19 +37,3 @@ class (Eq p, Monoid p) => Probability p where
   -- | Given the probabilities of two indepedent events, calculate the
   -- probability of both events occuring.
   pmul :: p -> p -> p
-
--- | The probability of an impossible event.
-pzero :: (Probability p) => p
-pzero = prob 0
-
--- | The probability of an event which always occurs.
-pone :: (Probability p) => p
-pone = prob 1
-
-{-
-We probably want something like this somewhere...
-
--- | Convert a probability to a floating-point number.
-doubleFromProb :: Prob -> Double
-doubleFromProb (Prob d) = d
--}

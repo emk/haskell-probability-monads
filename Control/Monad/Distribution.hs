@@ -86,9 +86,9 @@ catMaybes' = map (liftM fromJust) . filter (isJust . mvValue)
 bayes :: (Probability p) =>
          MaybeT (MVT p []) a -> Maybe ((MVT p []) a)
 bayes bfd
-    | total == pzero = Nothing
-    | otherwise      = Just (weighted (map unpack events))
+    | total == prob 0 = Nothing
+    | otherwise       = Just (weighted (map unpack events))
   where
     events = catMaybes' (runMVT (runMaybeT bfd))
-    total  = foldl' padd pzero (map mvMonoid events)
+    total  = foldl' padd (prob 0) (map mvMonoid events)
     unpack (MV p v) = (v, fromProb p)

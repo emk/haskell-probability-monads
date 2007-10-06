@@ -1,6 +1,6 @@
 module Control.Monad.Distribution.Double (
     module Control.Monad.Distribution,
-    DDist
+    DDist, BDDist
   ) where
 
 import Control.Monad.Distribution
