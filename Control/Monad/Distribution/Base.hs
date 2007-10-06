@@ -19,6 +19,7 @@ module Control.Monad.Distribution.Base (
     -- * Common interface
     -- $Interface
     Dist, weighted, uniform,
+    MonadPlus, mzero, mplus, guard, -- Re-exported from Control.Monad.
     -- * Random sampling functions
     -- $Rand
     module Control.Monad.Random,

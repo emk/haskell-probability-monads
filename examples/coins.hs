@@ -1,12 +1,13 @@
+{-# LANGUAGE NoMonomorphismRestriction #-}
+
 import Control.Monad
 import Control.Monad.Distribution
--- or import Control.Monad.Distribution.Rational
+-- or import Control.Monad.Distribution.Rational if you want exact answers
 import Data.List
 
 data Coin = Heads | Tails
   deriving (Eq, Ord, Show)
 
-toss :: (Dist d) => d Coin
 toss = uniform [Heads, Tails]
 
 tosses n = sequence (replicate 2 toss)
