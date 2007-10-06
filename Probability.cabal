@@ -7,6 +7,9 @@ License:             BSD3
 License-file:        LICENSE
 Author:              Eric Kidd
 Stability:           experimental
-Build-Depends:       base, mtl
-Exposed-modules:     Control.Monad.Dist, Control.Monad.Perhaps, Data.Prob
+Build-Depends:       base, mtl, MaybeT, MonadRandom
+Exposed-modules:     Data.Probability,
+                     Data.Probability.Double, Data.Probability.Rational,
+                     Control.Monad.MonoidValue,
+                     Control.Monad.Distribution
 ghc-options:         -Wall -O
