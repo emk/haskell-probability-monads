@@ -7,7 +7,11 @@ Portability  : non-portable (newtype deriving)
 Support for probability values.
 -}
 
-module Data.Probability (Probability, prob, pzero, pone, pnot, padd, pmul) where
+module Data.Probability (
+    Probability,
+    prob, fromProb,
+    pnot, padd, pmul, pzero, pone
+  ) where
 
 import Data.Monoid
 
@@ -15,8 +19,14 @@ import Data.Monoid
 -- class, allowing users of this library to choose among various
 -- representations of probability.
 class (Eq p, Monoid p) => Probability p where
+  -- TODO: Should 'prob' and 'fromProb' work with Rational or another type?
+  -- They exist mostly to interface with
+  -- 'Control.Monad.Distribution.weighted'.
+
   -- | Create a probability from a rational number between 0 and 1, inclusive.
   prob :: Rational -> p
+  -- | Convert a probability to a rational number.
+  fromProb :: p -> Rational
   -- | Given the probability of an event occuring, calculate the
   -- probability of the event /not/ occuring.
   pnot :: p -> p

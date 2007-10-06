@@ -22,12 +22,18 @@ module Control.Monad.Distribution (
     -- * Random sampling functions
     -- $Rand
     module Control.Monad.Random,
+    BRand,
     -- * Discrete, finite distributions
     -- $DDist
+    bayes
   ) where
 
+import Control.Monad
+import Control.Monad.Maybe
 import Control.Monad.MonoidValue
 import Control.Monad.Random
+import Data.List
+import Data.Maybe
 import Data.Probability
 
 {- $Interface
@@ -53,6 +59,19 @@ uniform = weighted . map (\x -> (x, 1))
 instance (Monad m, RandomGen g) => Dist (RandT g m) where 
   weighted = fromList
 
+-- | 
+type BRand g = MaybeT (Rand g)
+
+instance (RandomGen g) => MonadPlus (BRand g) where
+  mzero = MaybeT (return Nothing)
+  -- TODO: I'm not sure this is particularly sensible or useful.
+  d1 `mplus` d2 = MaybeT choose
+    where choose = do
+            x1 <- runMaybeT d1
+            case x1 of
+              Nothing -> runMaybeT d2
+              Just _  -> return x1
+
 {- $DDist
 -}
 
@@ -60,3 +79,16 @@ instance (Probability p) => Dist (MVT p []) where
   weighted wvs = MVT (map toMV wvs)
     where toMV (v, w) = MV (prob (w / total)) v 
           total = sum (map snd wvs)
+
+catMaybes' :: (Monoid w) => [MV w (Maybe a)] -> [MV w a]
+catMaybes' = map (liftM fromJust) . filter (isJust . mvValue)
+
+bayes :: (Probability p) =>
+         MaybeT (MVT p []) a -> Maybe ((MVT p []) a)
+bayes bfd
+    | total == pzero = Nothing
+    | otherwise      = Just (weighted (map unpack events))
+  where
+    events = catMaybes' (runMVT (runMaybeT bfd))
+    total  = foldl' padd pzero (map mvMonoid events)
+    unpack (MV p v) = (v, fromProb p)
