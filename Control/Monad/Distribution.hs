@@ -1,3 +1,18 @@
+{- |
+Copyright    : 2007 Eric Kidd
+License      : BSD3
+Stability    : experimental
+
+This module is a wrapper around @Control.Monad.Distribution.Base@.  It
+provides definitions of 'DDist', 'ddist', 'BDDist' and 'bddist' based on
+double-precion floating point numbers.
+
+For the main API, see @Control.Monad.Distribution.Base@.  For alternative
+versions of 'DDist', etc., based on exact rational numbers, see
+@Control.Monad.Distribution.Rational@.
+
+-}
+
 module Control.Monad.Distribution (
     module Control.Monad.Distribution.Base,
     DDist, ddist, BDDist, bddist

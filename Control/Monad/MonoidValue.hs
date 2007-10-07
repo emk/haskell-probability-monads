@@ -14,7 +14,7 @@ representing probability distributions or quantum states, where the extra
 functions provided by 'Control.Monad.Writer.Class.MonadWriter' are
 irrelevant or inappropriate.
 
-The |MV| monad and the |MVT| monad transformer were proposed by Dan Piponi
+The 'MV' monad and the 'MVT' monad transformer were proposed by Dan Piponi
 as a way of representing M-sets in Haskell.  An /M-set/ is a set with a
 monoid action (by analogy to the more common G-sets found in group theory).
 Here, 'MV' represents an element in a /free M-set/.  This is essentially a

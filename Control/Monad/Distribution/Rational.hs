@@ -1,3 +1,13 @@
+{- |
+Copyright    : 2007 Eric Kidd
+License      : BSD3
+Stability    : experimental
+
+An alternative version of @Control.Monad.Distribution@ based on exact
+rational numbers.
+
+-}
+
 module Control.Monad.Distribution.Rational (
     module Control.Monad.Distribution.Base,
     DDist, ddist, BDDist, bddist
