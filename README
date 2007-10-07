@@ -2,7 +2,11 @@ This is a probability library inspired by Martin Erwig's and Steve
 Kollmansberger's "Probabilistic Functional Programming"[1], but with many
 additions and an underlying structure factored into monad transformers.
 
-You will need MaybeT and MonadRandom from here:
+You will need MaybeT and MonadRandom from HackageDB:
+
+  http://hackage.haskell.org/packages/archive/pkg-list.html
+
+...or from Darcs:
 
   http://code.haskell.org/maybet/
   http://code.haskell.org/monadrandom/
