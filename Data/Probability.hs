@@ -1,3 +1,14 @@
+{- |
+Copyright    : 2007 Eric Kidd
+License      : BSD3
+Stability    : experimental
+
+This API is very limited, and only suited to use within the
+ProbabilityMonad library.  If you're interested in redesigning this, your
+input would be appreciated.
+
+-}
+
 module Data.Probability (
     module Data.Probability.Base,
     Prob()

@@ -2,7 +2,10 @@ Name:                ProbabilityMonads
 Version:             0.1.0
 Synopsis:            Probability distribution monads.
 Description:         Tools for random sampling, explicit enumeration of possible
-                     outcomes, and applying Bayes' rule.  Highly experimental.
+                     outcomes, and applying Bayes' rule.  Highly experimental,
+                     and subject to change.  In particular, the
+                     Data.Probability API is rather poor and could stand an
+                     overhaul.
 License:             BSD3
 License-file:        LICENSE
 Category:            Control
