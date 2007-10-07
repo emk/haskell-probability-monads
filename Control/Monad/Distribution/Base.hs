@@ -235,7 +235,7 @@ using 'Control.Monad.Distribution.bddist'.
 >--       MV 1%3 [Tails,Heads]]
 
 Note that we see rational numbers in this second example, because we used
-Control.Monad.Distribution.Rational above.
+@Control.Monad.Distribution.Rational@ above.
 
 -}
 
