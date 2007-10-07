@@ -1,7 +1,7 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 
 import Control.Monad
-import Control.Monad.Distribution
+import Control.Monad.Distribution.Rational
 -- or import Control.Monad.Distribution.Rational if you want exact answers
 import Data.List
 
@@ -10,9 +10,14 @@ data Coin = Heads | Tails
 
 toss = uniform [Heads, Tails]
 
-tosses n = sequence (replicate 2 toss)
+tosses n = sequence (replicate n toss)
 
 unorderedTosses n = liftM sort (tosses n)
+
+tossesWithAtLeastOneHead n = do
+  result <- tosses n
+  guard (Heads `elem` result)
+  return result
 
 {-
 

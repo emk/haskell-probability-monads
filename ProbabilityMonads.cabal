@@ -1,11 +1,13 @@
-Name:                Probability
-Version:             0.0
-Synopsis:            Tools for calculating with probabilities.
-Description:         Probabilities, probability distribution monads, and related
-                     tools.
+Name:                ProbabilityMonads
+Version:             0.1.0
+Synopsis:            Probability distribution monads.
+Description:         Tools for random sampling, explicit enumeration of possible
+                     outcomes, and applying Bayes' rule.  Highly experimental.
 License:             BSD3
 License-file:        LICENSE
-Author:              Eric Kidd
+Category:            Control
+Author:              Eric Kidd <haskell@randomhacks.net>
+Maintainer:          Eric Kidd <haskell@randomhacks.net>
 Stability:           experimental
 Build-Depends:       base, mtl, MaybeT, MonadRandom
 Exposed-modules:     Data.Probability.Base,
