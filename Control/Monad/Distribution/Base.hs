@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 {- |
 Copyright    : 2007 Eric Kidd
@@ -35,7 +36,7 @@ module Control.Monad.Distribution.Base (
 import Control.Monad
 import Control.Monad.Maybe
 import Control.Monad.MonoidValue
-import Control.Monad.Random
+import Control.Monad.Random hiding (uniform)
 import Control.Monad.Trans
 import Data.List
 import Data.Maybe
@@ -164,9 +165,7 @@ leaving 3 outcomes instead of the expected 4:
 
 -- Make all the standard instances of MonadRandom into probability
 -- distributions.
-instance (RandomGen g) => Dist (Rand g) where
-  weighted = fromList
-instance (Monad m, RandomGen g) => Dist (RandT g m) where 
+instance (Functor m, Monad m, RandomGen g) => Dist (RandT g m) where 
   weighted = fromList
 
 -- | Take @n@ samples from the distribution @r@.
@@ -181,15 +180,8 @@ sampleIO d n = evalRandIO (sample d n)
 type BRand g = MaybeT (Rand g)
 
 instance (RandomGen g) => BayesDist (MaybeT (Rand g))
-instance (RandomGen g, Monad m) => BayesDist (MaybeT (RandT g m))
+instance (RandomGen g, Monad m, Functor m) => BayesDist (MaybeT (RandT g m))
 
-instance (RandomGen g) => MonadPlus (MaybeT (Rand g)) where
-  mzero = randMZero
-  mplus = randMPlus
-
-instance (RandomGen g, Monad m) => MonadPlus (MaybeT (RandT g m)) where
-  mzero = randMZero
-  mplus = randMPlus
 
 randMZero :: (MonadRandom m) => (MaybeT m a)
 randMZero = MaybeT (return Nothing)
@@ -255,13 +247,6 @@ simplify = map (foldr1 merge) . groupEvents . sortEvents
         merge      (MV w1  v1) (MV w2  _)   = MV (w1 `padd` w2) v1
 
 instance (Probability p) => BayesDist (MaybeT (MVT p []))
-
-instance (Probability p) => MonadPlus (MaybeT (MVT p [])) where
-  mzero = MaybeT (return Nothing)
-  -- TODO: I'm not sure this is particularly sensible or useful.
-  d1 `mplus` d2
-     | isNothing (bayes d1)  = d2
-     | otherwise             = d1
 
 catMaybes' :: (Monoid w) => [MV w (Maybe a)] -> [MV w a]
 catMaybes' = map (liftM fromJust) . filter (isJust . mvValue)

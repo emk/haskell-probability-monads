@@ -12,7 +12,7 @@ import Data.Probability
 
 -- Each message is spam (junk mail) or "ham" (good mail).
 data MsgType = Spam | Ham
-  deriving (Show, Eq, Enum, Bounded)
+  deriving (Show, Eq, Enum, Bounded, Ord)
 
 hasWord :: String -> BDDist MsgType ->
            BDDist MsgType

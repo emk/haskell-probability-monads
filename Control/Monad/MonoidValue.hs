@@ -1,4 +1,5 @@
 {-# LANGUAGE MultiParamTypeClasses, UndecidableInstances #-}
+{-# LANGUAGE DatatypeContexts #-}
 
 {- |
 Copyright    : 2007 Eric Kidd
