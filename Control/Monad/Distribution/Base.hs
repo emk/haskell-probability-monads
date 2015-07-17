@@ -42,46 +42,6 @@ import Data.List
 import Data.Maybe
 import Data.Probability
 
-{- $Interface
-
-Common interfaces to probability monads.  For example, if we assume that a
-family has two children, each a boy or a girl, we can build a probability
-distribution representing all such families.
-
->{-# LANGUAGE NoMonomorphismRestriction #-}
->
->import Control.Monad.Distribution
->
->data Child = Girl | Boy
->  deriving (Show, Eq, Ord)
->
->child = uniform [Girl, Boy]
->
->family = do
->  child1 <- child
->  child2 <- child
->  return [child1, child2]
-
-The use of @NoMonomorphismRestriction@ is optional.  It eliminates the need
-for type declarations on @child@ and @family@:
-
->child :: (Dist d) => d Child
->child = uniform [Girl, Boy]
->
->family :: (Dist d) => d [Child]
->family = ...
-
-Unfortunately, using @NoMonomorphismRestriction@ may hide potential
-performance issues.  In either of the above examples, Haskell compilers may
-recompute @child@ from scratch each time it is called, because the actual
-type of the distribution @d@ is unknown.  Normally, Haskell requires an
-explicit type declaration in this case, in hope that you will notice the
-potential performance issue.  By enabling @NoMonomorphismRestriction@, you
-indicate that you intended the code to work this way, and don't wish to use
-type declarations on every definition.
-
--}
-
 -- | Represents a probability distribution.
 class (Functor d, Monad d) => Dist d where
   -- | Creates a new distribution from a weighted list of values.  The
@@ -93,38 +53,6 @@ class (Functor d, Monad d) => Dist d where
 -- | Creates a new distribution from a list of values, weighting it evenly.
 uniform :: Dist d => [a] -> d a
 uniform = weighted . map (\x -> (x, 1))
-
-{- $Bayes
-
-Using 'Control.Monad.guard', it's possible to calculate conditional
-probabilities using Bayes' rule.  In the example below, we choose to
-@Control.Monad.Distribution.Rational@, which calculates probabilities using
-exact rational numbers.  This is useful for small, interactive programs
-where you want answers like 1/3 and 2/3 instead of 0.3333333 and 0.6666666.
-
->{-# LANGUAGE NoMonomorphismRestriction #-}
->
->import Control.Monad
->import Control.Monad.Distribution.Rational
->import Data.List
->
->data Coin = Heads | Tails
->  deriving (Eq, Ord, Show)
->
->toss = uniform [Heads, Tails]
->
->tosses n = sequence (replicate n toss)
->
->tossesWithAtLeastOneHead n = do
->  result <- tosses n
->  guard (Heads `elem` result)
->  return result
-
-In this example, we use 'Control.Monad.guard' to discard possible outcomes
-where no coin comes up heads.
-
--}
-
 
 -- | A distribution which supports 'Dist' and 'Control.Monad.MonadPlus'
 -- supports Bayes' rule.  Use 'Control.Monad.guard' to calculate a
