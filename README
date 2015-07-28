@@ -1,3 +1,28 @@
+This is an email classifier based on Martin Erwig's and Steve
+Kollmansberger's "Probabilistic Functional Programming"[1].
+
+
+
+Build
+-----
+Run `cabal install` 
+
+Classify 
+--------
+To train the classifier add mails in `Spam/hamEmails/` and `Spam/spamEmails`
+
+Put the content of your mail in `mail.txt` and run classify.
+
+
+
+
+
+
+
+
+
+
+
 This is a probability library inspired by Martin Erwig's and Steve
 Kollmansberger's "Probabilistic Functional Programming"[1], but with many
 additions and an underlying structure factored into monad transformers.

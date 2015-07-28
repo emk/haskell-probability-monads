@@ -20,7 +20,20 @@ import Data.Probability.Base
 -- | An implementation of 'Data.Probability.Probability' using
 -- double-precision floating-point numbers.
 newtype Prob = Prob Double
-  deriving (Eq)
+  deriving (Eq, Ord)
+
+instance Num Prob where
+  (Prob n1) + (Prob n2) = Prob (n1 + n2)
+  (Prob n1) - (Prob n2) = Prob (n1 - n2)
+  (Prob n1) * (Prob n2) = Prob (n1 * n2)
+  abs (Prob n)          = Prob (abs n)
+  signum (Prob n)       = Prob (signum n)
+  fromInteger n         = Prob (fromInteger n)
+
+
+instance Fractional Prob where
+  fromRational r        = Prob (fromRational r)
+  (Prob n1) / (Prob n2) = Prob (n1 / n2)
 
 instance Probability Prob where
   prob = Prob . fromRational

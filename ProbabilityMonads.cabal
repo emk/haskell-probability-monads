@@ -1,4 +1,4 @@
-Name:                ProbabilityMonads
+Name:                Spam Classifier
 Version:             0.1.0
 Synopsis:            Probability distribution monads.
 Description:         Tools for random sampling, explicit enumeration of possible
@@ -6,18 +6,19 @@ Description:         Tools for random sampling, explicit enumeration of possible
                      and subject to change.  In particular, the
                      Data.Probability API is rather poor and could stand an
                      overhaul.
-License:             BSD3
 License-file:        LICENSE
 Category:            Control
-Author:              Eric Kidd <haskell@randomhacks.net>
-Maintainer:          Eric Kidd <haskell@randomhacks.net>
+Author:              Niki Vazou <nvazou@cs.ucsd.edu>
+Maintainer:          Niki Vazou <nvazou@cs.ucsd.edu>
 Stability:           experimental
-Build-Depends:       base, mtl, MaybeT, MonadRandom
+Build-Depends:       base, mtl, MaybeT, MonadRandom, stemmer, directory
 Exposed-modules:     Data.Probability.Base,
                      Data.Probability,
-                     Data.Probability.Rational,
+                     Data.BST,
                      Control.Monad.MonoidValue,
                      Control.Monad.Distribution.Base,
-                     Control.Monad.Distribution,
-                     Control.Monad.Distribution.Rational
+                     Control.Monad.Distribution
 ghc-options:         -Wall -fno-warn-orphans -O
+
+Executable:          classify
+Main-is:             Classify.hs
